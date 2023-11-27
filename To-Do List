@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task List App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        #task-container {
+            max-width: 400px;
+            width: 100%;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        #task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .task-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-item button {
+            background-color: #ff6464;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+        .task-item input[type="text"] {
+            border: none;
+            outline: none;
+            padding: 8px;
+            flex: 1;
+        }
+
+        .add-task {
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-task input[type="text"] {
+            border: none;
+            outline: none;
+            padding: 8px;
+            flex: 1;
+        }
+
+        .add-task button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="task-container">
+        <div class="add-task">
+            <input type="text" id="new-task" placeholder="Add a new task...">
+            <button onclick="addTask()">Add</button>
+        </div>
+        <ul id="task-list"></ul>
+    </div>
+
+    <script>
+        // Function to add a new task
+        function addTask() {
+            var taskInput = document.getElementById('new-task');
+            var taskText = taskInput.value.trim();
+
+            if (taskText !== '') {
+                var taskList = document.getElementById('task-list');
+                var newTaskItem = document.createElement('li');
+                newTaskItem.className = 'task-item';
+
+                var taskTextElement = document.createElement('input');
+                taskTextElement.type = 'text';
+                taskTextElement.value = taskText;
+                taskTextElement.readOnly = true;
+
+                var deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Delete';
+                deleteButton.onclick = function () {
+                    taskList.removeChild(newTaskItem);
+                    updateLocalStorage();
+                };
+
+                newTaskItem.appendChild(taskTextElement);
+                newTaskItem.appendChild(deleteButton);
+                taskList.appendChild(newTaskItem);
+
+                taskInput.value = '';
+                updateLocalStorage();
+            }
+        }
+
+        // Function to update local storage
+        function updateLocalStorage() {
+            var taskList = document.getElementById('task-list');
+            var tasks = [];
+
+            for (var i = 0; i < taskList.children.length; i++) {
+                var taskText = taskList.children[i].querySelector('input[type="text"]').value;
+                tasks.push(taskText);
+            }
+
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Function to load tasks from local storage
+        function loadTasks() {
+            var taskList = document.getElementById('task-list');
+            var storedTasks = localStorage.getItem('tasks');
+
+            if (storedTasks) {
+                var tasks = JSON.parse(storedTasks);
+
+                for (var i = 0; i < tasks.length; i++) {
+                    var newTaskItem = document.createElement('li');
+                    newTaskItem.className = 'task-item';
+
+                    var taskTextElement = document.createElement('input');
+                    taskTextElement.type = 'text';
+                    taskTextElement.value = tasks[i];
+                    taskTextElement.readOnly = true;
+
+                    var deleteButton = document.createElement('button');
+                    deleteButton.innerText = 'Delete';
+                    deleteButton.onclick = function () {
+                        taskList.removeChild(newTaskItem);
+                        updateLocalStorage();
+                    };
+
+                    newTaskItem.appendChild(taskTextElement);
+                    newTaskItem.appendChild(deleteButton);
+                    taskList.appendChild(newTaskItem);
+                }
+            }
+        }
+
+        // Load tasks on page load
+        loadTasks();
+    </script>
+</body>
+</html>
